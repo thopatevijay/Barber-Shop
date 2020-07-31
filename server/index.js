@@ -3,6 +3,7 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const { connect } = require('mongoose');
 const { success, error } = require('consola');
+const passport = require('passport');
 
 //  Bring the config 
 const { DB, PORT } = require('./config');
@@ -13,6 +14,9 @@ const app = express();
 // Middlewares
 app.use(cors());
 app.use(bodyparser.json());
+app.use(passport.initialize());
+
+require("./middlewares/passport")(passport);
 
 // Middlewares :  User Router
 app.use('/', require('./routes/usersRoutes'));

@@ -1,7 +1,7 @@
 const bcrypt =  require('bcryptjs');
 const User = require('../models/usersModel');
 const jwt = require('jsonwebtoken');
-
+const passport = require('passport');
 const { SECRET } = require('../config');
 
 // singup fucntion
@@ -72,7 +72,7 @@ const userLogin = async ( userCredentials, role, res) =>{
         });
     }
 
-    // checking the     password
+    // checking the password
     let isMatch = await bcrypt.compare(password, user.password);
     if(isMatch){
         // Sign in the token and issue it to the user
@@ -99,9 +99,23 @@ const userLogin = async ( userCredentials, role, res) =>{
             message: "You are logged In",
             success: true
         });
+
+        // if(user.role == 'customer'){
+        //     return res.status(200).json({
+        //             ...result,
+        //             message: "You are logged In as customer",
+        //             success: true
+        //         });
+        // }else{
+        //     return res.status(200).json({
+        //         ...result,
+        //         message: "You are logged In as Shop Owner",
+        //         success: true
+        //     });
+        // }
     } else {
         return res.status(403).json({
-            message: "Incorrect Password",
+            message: "Incorrect Password", 
             success: false
         });
     }
@@ -132,5 +146,27 @@ const validateEmail = async email => {
     }
 }
 
-module.exports = { userSignup, userLogin };
+// Passport middleqware
+const userAuth = passport.authenticate("jwt", { session: false});
+
+// Cheking role for the router authentication
+const checkRole = roles => (req,res,next) => {
+    if(roles.includes(req.user.role)){
+        return next();
+    }
+    return res.status(401).json({
+        message: "Unauthorized",
+        success: false
+    });
+};
+
+const serializeUser = user => {
+    return {
+        username: user.username,
+        email: user.email,
+        name: user.name
+    }
+}
+
+module.exports = { userSignup, userLogin, userAuth, serializeUser, checkRole};
 
