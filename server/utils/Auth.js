@@ -1,5 +1,8 @@
 const bcrypt =  require('bcryptjs');
 const User = require('../models/usersModel');
+const jwt = require('jsonwebtoken');
+
+const { SECRET } = require('../config');
 
 // singup fucntion
 
@@ -46,6 +49,71 @@ const userSignup = async (userDetails, role, res) => {
     }  
 };
 
+
+// Login function
+const userLogin = async ( userCredentials, role, res) =>{
+    try {
+
+    let { username, password } = userCredentials;
+
+    // Checking whether the username exists
+    const user = await User.findOne( { username });
+    if(!user){
+        return res.status(404).json({
+            message: "Username is not found.",
+            success: false
+        });
+    }
+    // Checking the role
+    if(user.role !== role){
+        return res.status(404).json({
+            message: "make sure you are logging from the right portal.",
+            success: false
+        });
+    }
+
+    // checking the     password
+    let isMatch = await bcrypt.compare(password, user.password);
+    if(isMatch){
+        // Sign in the token and issue it to the user
+        let token = jwt.sign({
+            user_id: user._id,
+            role: user.role,
+            username: user.username,
+            email: user.email
+        },
+        SECRET,
+        { expiresIn: "7 days"}
+        );
+
+        let result = {
+            username: user.username,
+            role: user.role,
+            email: user.email,
+            token: `Bearer ${token}` ,
+            expiresIn: 168
+        };
+
+        return res.status(200).json({
+            ...result,
+            message: "You are logged In",
+            success: true
+        });
+    } else {
+        return res.status(403).json({
+            message: "Incorrect Password",
+            success: false
+        });
+    }
+    } catch (err) {
+        console.log(err)
+     return res.status(500).json({
+         message: 'Unable to Log In',
+         success: true
+     });
+    }  
+}; 
+
 const validateUsername = async username => {
     let user = await User.findOne({ username });
     if(user){
@@ -64,5 +132,5 @@ const validateEmail = async email => {
     }
 }
 
-module.exports = { userSignup };
+module.exports = { userSignup, userLogin };
 
