@@ -20,6 +20,8 @@ require("./middlewares/passport")(passport);
 
 // Middlewares :  User Router
 app.use('/', require('./routes/usersRoutes'));
+// Customer Router
+app.use('/', require('./routes/customerRoutes'));
 
 
 const startApplication = async () => {

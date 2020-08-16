@@ -22,6 +22,12 @@ const UserSchema = new Schema(
             type: String,
             required: true
         },
+        shopName: {
+            type: String
+        },
+        address: {
+            type: String
+        },
         location: {
             type: String,
             required: true
@@ -29,9 +35,19 @@ const UserSchema = new Schema(
         phone: {
             type: String,
             required: true
-        }
+        },
+        workingHours: {
+            openingTime: {
+                type: String
+            },
+            closingTime: {
+                type: String
+            }
+        },
+        availableTimeSlots: []
     },
     { timestamps: true}
 )
+
 
 module.exports = model('users', UserSchema);
