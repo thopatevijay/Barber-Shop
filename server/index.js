@@ -22,13 +22,14 @@ require("./middlewares/passport")(passport);
 app.use('/', require('./routes/usersRoutes'));
 // Customer Router
 app.use('/', require('./routes/customerRoutes'));
-
+// Shop Owner Router
+app.use('/', require('./routes/shop_ownerRoutes'));
 
 const startApplication = async () => {
     try {
         // DB connection
         await connect(DB, {
-            useFindAndModify: true,
+            useFindAndModify: false,
             useUnifiedTopology : true,
             useNewUrlParser: true
         });

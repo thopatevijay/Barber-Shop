@@ -62,7 +62,7 @@ const previousBookings = async (params,res) => {
     } catch (error) {
         console.log(error)
         return res.status(500).json({
-            message: 'Error in retrieving prevoius bokkings.',
+            message: 'Error in retrieving prevoius bookings.',
             success: true
         });
     }
